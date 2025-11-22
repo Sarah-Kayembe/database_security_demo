@@ -1,0 +1,87 @@
+body {
+    background-color: #041b0f;
+    color: #15ff8a;
+    font-family: "Courier New", monospace;
+    padding: 20px;
+}
+
+/* Center the whole content area */
+.content {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+a { color: #00ffcc; }
+
+.ascii-box {
+    white-space: pre;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #15ff8a;
+    padding: 20px;
+    margin: 20px auto;
+    font-size: 15px;
+    text-align: left;         /* ASCII must stay left aligned */
+    display: inline-block;    /* so it centers */
+}
+
+.typing {
+    border-right: 2px solid #15ff8a;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 20px auto;
+    display: inline-block;
+    text-align: center;
+}
+
+.navbar {
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #15ff8a;
+    margin-bottom: 20px;
+}
+
+input, button {
+    background: #000;
+    border: 1px solid #15ff8a;
+    color: #15ff8a;
+    padding: 10px;
+}
+
+button{
+    width: 150px;
+    padding: 13px;
+}
+
+button:hover {
+    background: #15ff8a;
+    color: #000;
+}
+
+.navbar {
+    width: 100%;
+    border-bottom: 1px solid #15ff8a;
+    padding: 10px 0;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.nav-list {
+    list-style: none;
+    display: inline-flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-list .nav-link {
+    color: #15ff8a;
+    text-decoration: none;
+}
+
+.nav-list .nav-link:hover {
+    color: #00ffaa;
+}
+
+
+

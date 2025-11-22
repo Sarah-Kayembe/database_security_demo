@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>LEVEL 1 COMPLETE</h2>
+
+<div class="ascii-box">
+You unlocked the first chamber.
+
+      ___
+     /   \
+    |  X  |  <== Treasure fragment recovered
+     \___/
+
+{% if words %}
+<p><b>Secret Word Uncovered:</b></p>
+<p style="color:#00ff99; font-size:20px;">
+    {{ words|join(" ") }}
+</p>
+{% else %}
+<p>No secret word yet... Try injecting again.</p>
+{% endif %}
+
+Clue:
+"Seek the marketplace.  
+ Search for forbidden words."
+</div>
+
+<p><a href="/search?s=">▶ Level 2: Search Injection</a></p>
+
+{% endblock %}

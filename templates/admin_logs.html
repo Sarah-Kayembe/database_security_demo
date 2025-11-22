@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📝 Injection Logs</h2>
+
+<div class="ascii-box">
+Below are recent SQL injection attempts captured by your traps.
+</div>
+
+<pre>{{LOG_ENTRIES}}</pre>
+
+{% endblock %}

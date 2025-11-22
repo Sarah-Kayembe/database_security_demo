@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <script src="/static/js/typing.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <ul class="nav-list">
+        {{ NAVBAR_USER|safe }}
+    </ul>
+</nav>
+
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

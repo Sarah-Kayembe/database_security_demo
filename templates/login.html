@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🔐 LEVEL 1 — Login Bypass</h2>
+
+<div class="ascii-box">
+   Enter the gate…  
+   But a secret phrase may open it quicker.
+</div>
+
+<form method="POST" action="/login">
+    <p>Username:</p>
+    <input name="username">
+    
+    <p>Password:</p>
+    <input name="password" type="password">
+
+    <br><br>
+    <button>Enter</button>
+</form>
+
+{{ERROR}}
+
+{% endblock %}

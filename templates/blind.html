@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🕶️ LEVEL 3 — Blind SQL Injection</h2>
+
+<div class="ascii-box">
+    The Oracle sees only truth or lies.<br>
+    Ask your question **in the URL bar**, and the shadows will answer.
+    <br><br>
+    Example path:<br>
+    <code>/blind?id=1' AND 1=1 --</code>
+</div>
+
+{% if result %}
+<hr>
+<h3>Oracle’s Response:</h3>
+<div class="ascii-box">
+    {{ result|safe }}
+</div>
+{% endif %}
+
+{% if dangerous %}
+    {% if already_claimed %}
+        <hr>
+        <div class="ascii-box" style="color:#f88;">
+            <strong>The Oracle whispers:</strong><br>
+            “You have already taken what this chamber guards.”  
+        </div>
+    {% else %}
+        <hr>
+        <div class="ascii-box" style="color:#0f0;">
+            <strong>Secret Word Earned:</strong> {{ last_word }}<br><br>
+            “Another fragment of the ancient phrase reveals itself…”
+        </div>
+    {% endif %}
+{% endif %}
+
+<hr>
+<p style="margin-top:20px;">
+    <a href="/columns">▶ Level 4: Column Depth Chamber</a>
+</p>
+
+{% endblock %}

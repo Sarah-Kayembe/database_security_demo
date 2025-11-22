@@ -1,0 +1,35 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+*.pkl
+
+# ---- Environment Files ----
+.env
+*.env
+venv/
+ENV/
+env/
+.venv/
+
+# ---- SQLite Database ----
+database.db
+*.sqlite
+*.sqlite3
+
+# ---- Flask / Build ----
+instance/
+*.log
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+
+# ---- Render / Deployment ----
+# (no special files needed)

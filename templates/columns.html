@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🔢 LEVEL 4.5 — Column Depth Chamber</h2>
+
+<div class="ascii-box">
+    The chamber responds only to those who can  
+    **sense the number of columns** in the spell before them.
+
+    <br><br>
+    <strong>Hint:</strong>  
+    Your SQL magic must be placed in the <u>URL bar</u>.
+
+    <div style="font-size:0.9rem; margin-top:10px;">
+        /columns?id=1 ORDER BY 1 --  
+        /columns?id=1 ORDER BY 2 --  
+        /columns?id=1 ORDER BY 3 --  
+    </div>
+</div>
+
+<hr>
+
+<h3>Column Oracle Response:</h3>
+
+<div class="ascii-box">
+    {% if result %}
+        {{ result|safe }}
+    {% else %}
+        <span style="color:#999;">The chamber waits for your probe…</span>
+    {% endif %}
+</div>
+
+{% if dangerous %}
+    <hr>
+
+    {% if already_claimed %}
+        <div class="ascii-box" style="color:#f88;">
+            “You have already taken the secret of this chamber.”
+        </div>
+    {% else %}
+        <div class="ascii-box" style="color:#0f0;">
+            <strong>Secret Word Earned:</strong> {{ last_word }}<br><br>
+            “You have mastered the structure of the spell…”
+        </div>
+    {% endif %}
+{% endif %}
+
+<p style="margin-top:20px;">
+    <a href="/debug?id=1">▶ Continue to Level 4: UNION File Dump</a>
+</p>
+
+{% endblock %}

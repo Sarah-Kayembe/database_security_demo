@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🔮 The Final Puzzle</h2>
+
+<div class="ascii-box">
+    The chamber glows as you attempt to speak  
+    the Ancient Sentence of Power…
+</div>
+
+{% if error %}
+<div class="ascii-box" style="color:#f55; margin-top:15px;">
+    {{ error|safe }}
+</div>
+{% endif %}
+
+<hr>
+
+<form method="POST" action="/final_phrase">
+    <p><strong>Enter the full Ancient Sentence:</strong></p>
+    <input type="text" name="phrase" value="{{ entered }}" style="width:100%; padding:8px;">
+    <br><br>
+    <button class="btn btn-primary">Speak the Incantation</button>
+</form>
+
+<p style="margin-top:20px;">
+    <a href="/admin/logs">Back to the Records</a>
+</p>
+
+{% endblock %}
