@@ -63,8 +63,14 @@ ADVANCED_DEBUG_INJECTIONS = {
 app = Flask(__name__)
 app.secret_key = "super-secret-ctf-key"
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database.db")
+B# Use Render's persistent disk directory if available
+RENDER_DATA_DIR = os.environ.get("RENDER_DATA_DIR", None)
+
+if RENDER_DATA_DIR:
+    DB_PATH = os.path.join(RENDER_DATA_DIR, "database.db")
+else:
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    DB_PATH = os.path.join(BASE_DIR, "database.db")
 
 
 # ----------------------------------------------------
