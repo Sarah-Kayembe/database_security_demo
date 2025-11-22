@@ -63,7 +63,7 @@ ADVANCED_DEBUG_INJECTIONS = {
 app = Flask(__name__)
 app.secret_key = "super-secret-ctf-key"
 
-B# Use Render's persistent disk directory if available
+# Use Render's persistent disk directory if available
 RENDER_DATA_DIR = os.environ.get("RENDER_DATA_DIR", None)
 
 if RENDER_DATA_DIR:
