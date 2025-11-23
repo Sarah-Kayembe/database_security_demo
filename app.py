@@ -63,14 +63,17 @@ ADVANCED_DEBUG_INJECTIONS = {
 app = Flask(__name__)
 app.secret_key = "super-secret-ctf-key"
 
-# Use Render's persistent disk directory if available
-RENDER_DATA_DIR = os.environ.get("RENDER_DATA_DIR", None)
+# ----------------------------------------------------
+# DATABASE PATH — LOCAL vs RENDER DISK
+# ----------------------------------------------------
+import os
 
-if RENDER_DATA_DIR:
-    DB_PATH = os.path.join(RENDER_DATA_DIR, "database.db")
+if os.environ.get("RENDER"):
+    DB_PATH = "/var/data/database.db"
 else:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     DB_PATH = os.path.join(BASE_DIR, "database.db")
+
 
 
 # ----------------------------------------------------
@@ -160,6 +163,16 @@ def init_db():
     conn.close()
     print("Database initialized and seeded.")
 
+# ----------------------------------------------------
+# Ensure DB exists even when running under gunicorn
+# ----------------------------------------------------
+def ensure_db_ready():
+    try:
+        init_db()
+    except Exception as e:
+        print("DB init failed:", e)
+
+ensure_db_ready()
 
 # ----------------------------------------------------
 # NAVBAR
