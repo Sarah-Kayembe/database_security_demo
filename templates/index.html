@@ -2,15 +2,13 @@
 {% block content %}
 
 <div class="ascii-box">
- ██╗   ██╗███████╗ ██████╗██╗     ███████╗
- ██║   ██║██╔════╝██╔════╝██║     ██╔════╝
- ██║   ██║█████╗  ██║     ██║     █████╗  
- ╚██╗ ██╔╝██╔══╝  ██║     ██║     ██╔══╝  
-  ╚████╔╝ ███████╗╚██████╗███████╗███████╗
-   ╚═══╝  ╚══════╝ ╚═════╝╚══════╝╚══════╝
+<img src="{{ url_for('static', filename='images/the gates.png') }}" alt="The Architect's Gate" style="width: 300px; height: auto;">
+<br>
+<img src="{{ url_for('static', filename='images/gate.png') }}" alt="The Architect's Gate" style="width: 300px; height: auto;">
 </div>
 
-<h2>🗺️ Welcome, Adventurer.</h2>
+
+<br>
 
 <p id="intro" class="typing"></p>
 
@@ -18,9 +16,11 @@
 typeText(
     "intro",
     [
-        "Your mission begins here.",
-        "Rumor says an ancient admin left secrets buried in this server.",
-        "To begin, you must break into the system.",
+        "Rumor says an ancient admin, known only as The Architect,",
+        "left untold secrets buried deep",
+        "within this forgotten server.",
+        "These are the blueprints of the old web, and they hold immense",
+        "power. To even begin the quest, you must breach the gates",
         "Your first task:",
         "➤ Bypass the LOGIN page."
     ]

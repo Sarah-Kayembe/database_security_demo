@@ -1,23 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>🗄️ LEVEL 4 — UNION SELECT File Dump</h2>
+<h2>LEVEL 5 — UNION SELECT File Dump</h2>
 
 <div class="ascii-box">
-    Deep within the Archive of Lost Records,  
-    forbidden knowledge sleeps behind iron locks.
-
+    <img src="{{ url_for('static', filename='images/debug.png') }}" alt="The Archive Gate" style="width: 320px; height: auto;">
     <br><br>
-    <strong>Hint:</strong><br>
-    The Archive only responds to UNION-based magic  
-    placed <u>in the URL bar</u> — for example:
-    <br>
-    <code>/debug?id=1 union select name from sqlite_master --</code><br>
-    <code>/debug?id=1 union select username || ':' || password from users --</code>
+    <b>
+        Beneath the stairwells of the Forgotten Sanctum lies the Archive of Lost Records.  
+        Whisper your UNION-spell not into the URL-bar, but into this sealed invocation box —  
+        for the Keeper now rejects magic cast from wandering address scrolls.
+        <br> ⬇
+    </b>
 </div>
 
 <hr>
 
+<form method="POST" action="/debug" class="debug-form">
+    <label for="id">Invoke your UNION spell:</label><br>
+    <input type="text" id="id" name="id" class="input-spell">
+    <button type="submit" class="btn-cast">Cast Spell</button>
+</form>
+
+<hr>
 <h3>Archive Response:</h3>
 
 {% if not attempted %}
@@ -31,34 +36,23 @@
     </div>
 
     {% if dangerous %}
-        {% if already_claimed %}
-            <hr>
-            <div class="ascii-box" style="color:#f88;">
-                <strong>The Archive Keeper speaks:</strong><br>
-                “You have already pulled a secret from these records.  
-                The shelves hold nothing more for you.”
-            </div>
-        {% else %}
-            {% if last_word %}
-                <hr>
-                <div class="ascii-box" style="color:#0f0;">
-                    <strong>Secret Word Earned:</strong> {{ last_word }}<br><br>
-                    “A shard of the Ancient Sentence reveals itself…”
-                </div>
-            {% endif %}
-        {% endif %}
+        <hr>
+        <div class="ascii-box" style="color:#0f0;">
+            <strong>Secret Word Earned:</strong> {{ last_word }}<br><br>
+            “A shard of the Ancient Sentence reveals itself…”
+        </div>
     {% else %}
         <hr>
         <div class="ascii-box" style="color:#ff6;">
             <strong>The Archive rustles faintly…</strong><br>
-            Your UNION magic stirred the shelves, but not in the right way.<br>
-            The keeper remains unconvinced — try a more precise UNION spell.
+            Your UNION magic stirred the shelves, but not the correct shelf.<br>
+            Try a more precise UNION spell.
         </div>
     {% endif %}
 {% endif %}
 
 <p style="margin-top:20px;">
-    <a href="/admin_secret">▶ Level 5: Admin Login Bypass</a>
+    <a href="/admin_secret">▶ Level 6: Admin Login Bypass</a>
 </p>
 
 {% endblock %}

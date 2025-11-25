@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>🔐 LEVEL 1 — Login Bypass</h2>
+<h2>LEVEL 1 — Login Bypass</h2>
+
+<img src="{{ url_for('static', filename='images/titan.png') }}" alt="The Architect's Gate" style="width: 300px; height: auto;">
 
 <div class="ascii-box">
-   Enter the gate…  
-   But a secret phrase may open it quicker.
+   This is the server's outer gate. You don't have a key, 
+   so you must whisper a "scecret phrase" into the input fields—
+   a command so fundamentally flawed it confuses the gate's 
+   lock mechanism, forcing it to open.
 </div>
 
 <form method="POST" action="/login">

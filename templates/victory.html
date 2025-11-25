@@ -1,16 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>🏁 Victory — You Found the FLAG!</h2>
+<h2>Victory</h2>
 
-<div class="terminal-box mt-4">
-    Congratulations, Agent.
-
+<div class="ascii-box">
+    <strong>🎉  Congratulations, Hacker.</strong><br>
     You have exploited every vulnerability and reached the admin logs.
+    <br><br>
 
-    🎉 FLAG:  SQL-CTF-{YOU-ARE-UNSTOPPABLE}
+    <div class="fade-container">
 
-    The treasure is yours.
+        <img id="img1"
+            src="{{ url_for('static', filename='images/key.png') }}"
+            class="fade-image visible img-center img-large">
+
+        <img id="img2"
+            src="{{ url_for('static', filename='images/key_only.png') }}"
+            class="fade-image img-center img-small">
+
+    </div>
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br><br><br>
+    <b>Ancient phrase echos: SQL IS A LOCK INEJECTION IS THE KEY </b>
 </div>
+
+<p style="margin-top:20px;">
+    <a href="/admin/logs">▶ View Injection Logs</a><br>
+</p>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const img1 = document.getElementById("img1");
+    const img2 = document.getElementById("img2");
+
+    setTimeout(() => {
+        img1.classList.remove("visible");
+        img2.classList.add("visible");
+    }, 2000);  // Change image after 2 seconds
+});
+</script>
 
 {% endblock %}

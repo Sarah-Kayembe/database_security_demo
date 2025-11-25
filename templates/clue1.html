@@ -4,23 +4,34 @@
 <h2>LEVEL 1 COMPLETE</h2>
 
 <div class="ascii-box">
-You unlocked the first chamber.
+You have unloacked the gates.
+<br>
+<br>
 
-      ___
-     /   \
-    |  X  |  <== Treasure fragment recovered
-     \___/
+<img src="{{ url_for('static', filename='images/openGate.png') }}" alt="The Architect's Gate" style="width: 440px; height: auto;">
+<p><b>Hark! A Seal is Broken.
 
-{% if words %}
-<p><b>Secret Word Uncovered:</b></p>
-<p style="color:#00ff99; font-size:20px;">
-    {{ words|join(" ") }}
-</p>
+By cunning craft, you have won a Word of Power.
+
+Guard this secret well, young seeker, 
+for the final gate remains bound by others. 
+The time shall surely come when all these scattered Words 
+must be spoken together to pierce the veil of the Architect's 
+final sanctuary.
+
+Do not lose this truth to the shadows!</b></p>
+{% if last_word %}
+    <b>Secret Word Uncovered:</b>
+        <span style="color:#0f0; font-size:1.4rem;">
+            {{ last_word }}
+        </span>
 {% else %}
-<p>No secret word yet... Try injecting again.</p>
+        <span style="color:#f88;">No word has been awarded yet.</span>
 {% endif %}
 
-Clue:
+<br>
+<br>
+Next Level Clue:
 "Seek the marketplace.  
  Search for forbidden words."
 </div>

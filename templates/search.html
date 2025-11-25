@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>🔎 LEVEL 2 — Search Injection</h2>
+<h2>LEVEL 2 — Search Injection</h2>
 
 <div class="ascii-box">
-    The marketplace lies before you…  
-    But only forbidden queries awaken its secrets.
+    <img src="{{ url_for('static', filename='images/marketplace.png') }}" alt="Great Bazaar" style="width: 300px; height: auto;">
+    <br>
+
+    Before you lies the Great Bazaar of the Archives, sprawling and vast. Yet, know this, traveler: The wares you seek are not sold openly, nor found by casual glance. Only the Whispers of the Forbidden Tongue shall awaken its deepest, most perilous secrets.
+     ˋ°•*⁀➷ ˋ°•*⁀➷ ˋ°•*⁀➷ ˋ°•*⁀➷ ˋ°•*⁀➷ ˋ°•*⁀➷ ˋ°•*⁀➷ 
+     <br>
+     ↓
 </div>
 
 <form method="GET" action="/search">
@@ -31,9 +36,11 @@
 
     <div class="ascii-box" style="color:#ff6;">
     {% if dangerous %}
-        <strong>You have disturbed the code…</strong><br>
-        Your injection rattles the marketplace,<br>
-        but your technique is too weak to reveal its secrets, mere mortal!<br><br>
+        <strong>You have disturbed the marketplace…</strong><br>
+        Vain effort, mortal! Your injection rings hollow. The secrets of this market yield only to a UNION, SELECT query forged with perfect knowledge. Be gone, and hone your UNION query!<br><br>
+
+        <img src="{{ url_for('static', filename='images/android.png') }}" alt="The Architect's Gate" style="width: 150px; height: auto;">
+         <br>
 
         <em>“The gatekeeper whispers:”</em><br>
         <span style="color:#0f0;">
@@ -41,6 +48,8 @@
             if you want me to surrender my knowledge.”
         </span>
     {% else %}
+        <img src="{{ url_for('static', filename='images/error.png') }}" alt="The Architect's Gate" style="width: 290px; height: auto;">
+        <br>
         (What is that? Brother ewww! That which you seek cannot be found here! Be gone!)
     {% endif %}
     </div>
@@ -52,7 +61,7 @@
 <hr>
 
 {# ----------------------------------------------- #}
-{# NEW BLOCK → If the secret word was already taken #}
+{# If the secret word was already taken #}
 {# ----------------------------------------------- #}
 
 {% if already_claimed %}

@@ -1,52 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>🔢 LEVEL 4.5 — Column Depth Chamber</h2>
+<h2>LEVEL 4 — Column Depth Chamber</h2>
 
 <div class="ascii-box">
-    The chamber responds only to those who can  
-    **sense the number of columns** in the spell before them.
+    <img src="{{ url_for('static', filename='images/columns.png') }}" alt="The Architect's Gate" style="width: 320px; height: auto;">
+    <br><br>
+    <b>Foolish is the eye that seeks the rune directly! This arcane barrier yields only to the mind that can measure the architecture of the spell itself. The Chamber responds only to those who can sense the number of columns in the forgotten tongue before them.</b>
 
     <br><br>
-    <strong>Hint:</strong>  
-    Your SQL magic must be placed in the <u>URL bar</u>.
-
-    <div style="font-size:0.9rem; margin-top:10px;">
-        /columns?id=1 ORDER BY 1 --  
-        /columns?id=1 ORDER BY 2 --  
-        /columns?id=1 ORDER BY 3 --  
-    </div>
+    <strong>Hint:</strong><br>
+    For this demo, cast your spell in the field below.  
+    What you type will be stitched directly into the query’s <code>id = ...</code> clause.
 </div>
 
 <hr>
 
-<h3>Column Oracle Response:</h3>
+<form method="POST" action="/columns" class="columns-form">
+    <label for="id">Arcane ID / ORDER BY spell:</label><br>
+    <input type="text" id="id" name="id" class="input-spell">
+    <button type="submit" class="btn-cast">Cast Spell</button>
+</form>
 
-<div class="ascii-box">
-    {% if result %}
-        {{ result|safe }}
-    {% else %}
-        <span style="color:#999;">The chamber waits for your probe…</span>
-    {% endif %}
-</div>
-
-{% if dangerous %}
+{% if result %}
     <hr>
-
-    {% if already_claimed %}
-        <div class="ascii-box" style="color:#f88;">
-            “You have already taken the secret of this chamber.”
-        </div>
-    {% else %}
-        <div class="ascii-box" style="color:#0f0;">
-            <strong>Secret Word Earned:</strong> {{ last_word }}<br><br>
-            “You have mastered the structure of the spell…”
-        </div>
-    {% endif %}
+    <h3>Column Oracle Response:</h3>
+    <div class="ascii-box">
+        {{ result|safe }}
+    </div>
 {% endif %}
 
+{% if rows %}
+    <hr>
+    <h3>SQL Output:</h3>
+    <div class="ascii-box sql-output">
+        {% for r in rows %}
+            {{ r }}<br>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if dangerous and earned_secret %}
+<hr>
+<div class="ascii-box" style="color:#0f0;">
+    <strong>Secret Word Earned:</strong> {{ last_word }}<br><br>
+    “You have mastered the structure of the spell…”
+</div>
+{% endif %}
+
+
 <p style="margin-top:20px;">
-    <a href="/debug?id=1">▶ Continue to Level 4: UNION File Dump</a>
+    <a href="/debug?id=1">▶ Continue to Level 5: UNION File Dump</a>
 </p>
 
 {% endblock %}

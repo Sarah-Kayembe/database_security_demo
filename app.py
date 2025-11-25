@@ -242,10 +242,14 @@ def award_random_secret_word():
     return new_word
 
 
+@app.route("/")
+def intro():
+    return render_template("intro.html")
+
 # ----------------------------------------------------
 # HOME
 # ----------------------------------------------------
-@app.route("/")
+@app.route("/home")
 def index():
     return render_template("index.html", title="SQL Injection Quest – Home")
 
@@ -261,8 +265,15 @@ def login():
     username = request.form.get("username", "")
     password = request.form.get("password", "")
 
-    injection_signs = ["'", "\"", ";", "--", "/*", "*/", " OR ", " or ", " UNION ", " union "]
-    is_injection = any(sig in username or sig in password for sig in injection_signs)
+    injection_signs = ["'", "\"", ";", "--", "/*", "*/", " or ", " OR ", "union", "UNION", "select", "SELECT", "="]
+
+    lower_user = username.lower()
+    lower_pass = password.lower()
+
+    is_injection = any(sig in lower_user or sig in lower_pass for sig in injection_signs)
+
+    print("Injection detected?", is_injection, "USERNAME:", username, "PASSWORD:", password)
+
 
     conn = get_db()
     cur = conn.cursor()
@@ -322,10 +333,9 @@ def clue1():
     if "user" not in session:
         return redirect("/login")
 
-    ids = session.get("secret_word_ids", [])
-    words = [SECRET_WORDS[i] for i in ids]
+    last_word = session.get("last_secret_word", None)
 
-    return render_template("clue1.html", words=words)
+    return render_template("clue1.html", last_word=last_word)
 
 
 # ----------------------------------------------------
@@ -339,16 +349,20 @@ def search():
     term = request.args.get("s", "")
     lower_term = term.lower()
 
-    # Strong UNION-based SQL injection (eligible for secret word)
-    is_union_attack = "union" in lower_term and "select" in lower_term
+    # STRONG attack → must include UNION + SELECT
+    is_union_attack = ("union" in lower_term and "select" in lower_term)
 
-    # Weak injection (basic OR / quotes)
+    # WEAK attacks → quotes, OR 1=1, comment marks, etc.
     is_weak_attack = (
-        "'" in term or
-        "--" in lower_term or
-        " or " in lower_term
+        ("'" in term) or
+        ("--" in lower_term) or
+        (" or " in lower_term) or
+        ("#" in lower_term) or
+        ("/*" in lower_term)
     )
 
+    # Dangerous only means “SQLi-looking” (for visual effects)
+    # but only UNION SELECT gives a reward.
     dangerous = is_union_attack or is_weak_attack
 
     query = f"SELECT id, name, description FROM products WHERE name LIKE '%{term}%'"
@@ -366,24 +380,28 @@ def search():
         error = str(e)
 
     already_awarded = session.get("secret_given_search", False)
-    last_word = session.get("last_secret_word")
+    last_word = None
 
-    # Strong UNION attacks award a secret word ONCE on this level
+    # ⭐ Only UNION SELECT gets a secret word once
     if is_union_attack:
         if not already_awarded:
             award_random_secret_word()
             session["secret_given_search"] = True
-            last_word = session.get("last_secret_word")
+        last_word = session.get("last_secret_word")
+
+    # Weak attack = NO secret word
+    # last_word stays None for weak attack
 
     return render_template(
         "search.html",
         term=term,
         results=results,
         error=error,
-        dangerous=dangerous,
+        dangerous=dangerous,  # still highlights page
         last_word=last_word,
         already_claimed=already_awarded
     )
+
 
 
 # ----------------------------------------------------
@@ -434,16 +452,18 @@ def clue3():
 # ----------------------------------------------------
 # LEVEL 3 — BLIND SQL INJECTION (Boolean Oracle)
 # ----------------------------------------------------
-@app.route("/blind")
+@app.route("/blind", methods=["GET"])
 def blind():
     if "user" not in session:
         return redirect("/login")
 
-    target = request.args.get("id", "")
-    lower_t = target.lower()
+    payload = request.args.get("id", "")
+    lower_p = payload.lower().strip()
 
-    # First arrival: no param → no oracle output
-    if target == "":
+    print("RAW BLIND PAYLOAD:", repr(payload))
+
+    # First visit → show the page with no result
+    if payload == "":
         return render_template(
             "blind.html",
             result=None,
@@ -452,27 +472,41 @@ def blind():
             last_word=None,
         )
 
-    # Detect proper blind attempts
-    is_blind = any(sig in lower_t for sig in ADVANCED_BLIND_INJECTIONS)
+    # --- STRONG BLIND INJECTION DETECTION -------------------------
+    # Payload must contain BOTH:
+    #   1. a single quote (')
+    #   2. AND one of the advanced blind injection patterns
+    is_blind_attack = (
+        "'" in payload and
+        any(sig in lower_p for sig in ADVANCED_BLIND_INJECTIONS)
+    )
 
-    # Weak attempts (classic OR 1=1 style)
-    weak = (" or " in lower_t) or ("'" in lower_t and "and" not in lower_t)
+    # --- WEAK INJECTIONS (DO NOT REWARD WORDS) ---------------------
+    is_weak_attack = (
+        (" or " in lower_p and "and" not in lower_p)
+        or ( "'" in payload and not is_blind_attack )
+    )
 
+    # ---------------------------------------------------------------
+    # EXECUTE BOOLEAN QUERY
+    # ---------------------------------------------------------------
     boolean = None
     oracle_msg = None
 
-    if is_blind:
+    if is_blind_attack:
         conn = get_db()
         cur = conn.cursor()
-        log_injection(target, "/blind")
+        log_injection(payload, "/blind")
 
-        query = f"SELECT 1 FROM users WHERE id='{target}'"
+        query = f"SELECT 1 FROM users WHERE id='{payload}'"
+
         try:
             cur.execute(query)
             row = cur.fetchone()
             boolean = True if row else False
         except Exception:
             boolean = False
+
         conn.close()
 
         if boolean:
@@ -480,26 +514,29 @@ def blind():
         else:
             oracle_msg = "<span style='color:#f55;'>FALSE — darkness remains.</span>"
 
-    # Weak-only attempts
-    if weak and not is_blind:
-        oracle_msg = (
-            "<span style='color:#f80;'>"
-            "“YOU SHALL NOT PASS! Such weak magic has no effect here.”"
-            "</span>"
-        )
+    # ---------------------------------------------------------------
+    # WEAK ATTACK RESPONSE
+    # ---------------------------------------------------------------
+    if is_weak_attack and not is_blind_attack:
         return render_template(
             "blind.html",
-            result=oracle_msg,
+            result=(
+                "<span style='color:#f80;'>"
+                "“Your magic lacks finesse. This Oracle answers only to precise rituals.”"
+                "</span>"
+            ),
             dangerous=False,
             already_claimed=False,
             last_word=None,
         )
 
-    # Secret word logic
+    # ---------------------------------------------------------------
+    # SECRET WORD AWARD SYSTEM
+    # ---------------------------------------------------------------
     already_claimed = session.get("secret_given_blind", False)
     last_word = None
 
-    if is_blind:
+    if is_blind_attack:
         if not already_claimed:
             award_random_secret_word()
             last_word = session.get("last_secret_word")
@@ -508,44 +545,53 @@ def blind():
     return render_template(
         "blind.html",
         result=oracle_msg,
-        dangerous=is_blind,
+        dangerous=is_blind_attack,
         already_claimed=already_claimed,
         last_word=last_word,
     )
 
 
 # ----------------------------------------------------
-# LEVEL 4 — UNION SQLI (File / Schema Dump)
+# LEVEL 5 — UNION SQLI (File / Schema Dump)
 # ----------------------------------------------------
-@app.route("/debug")
+@app.route("/debug", methods=["GET", "POST"])
 def debug():
     if "user" not in session:
         return redirect("/login")
 
-    payload = request.args.get("id", None)
-
-    # First arrival: nothing attempted yet
-    if payload is None:
+    # First arrival — nothing attempted
+    if request.method == "GET":
         return render_template(
             "debug.html",
             attempted=False,
             dangerous=False,
             output="",
-            already_claimed=False,
-            last_word=None,
+            last_word=None
+        )
+
+    # POST submission
+    payload = request.form.get("id", "").strip()
+    attempted = True
+
+    if payload == "":
+        return render_template(
+            "debug.html",
+            attempted=True,
+            dangerous=False,
+            output="<span style='color:#f80;'>The Archive awaits a UNION spell…</span>",
+            last_word=None
         )
 
     lower_payload = payload.lower()
-    matched_key = None
-    for inj in ADVANCED_DEBUG_INJECTIONS.keys():
-        if inj in lower_payload:
-            matched_key = inj
-            break
 
-    dangerous = matched_key is not None
+    # Detect UNION attack
+    import re
+    dangerous = bool(re.search(r"\bunion\b", lower_payload))
 
+    # Log injection attempt
     log_injection(payload, "/debug")
 
+    # Intentionally vulnerable query
     query = f"SELECT username FROM users WHERE id={payload}"
 
     conn = get_db()
@@ -563,87 +609,87 @@ def debug():
 
     conn.close()
 
-    already_claimed = session.get("secret_given_debug", False)
+    # Award secret every time a correct UNION attack is detected
     last_word = None
-
-    if dangerous and not already_claimed:
-        award_random_secret_word()
-        last_word = session.get("last_secret_word")
-        session["secret_given_debug"] = True
-    elif dangerous and already_claimed:
-        last_word = session.get("last_secret_word")
+    if dangerous:
+        last_word = award_random_secret_word()
 
     return render_template(
         "debug.html",
-        attempted=True,
+        attempted=attempted,
         dangerous=dangerous,
         output=output,
-        already_claimed=already_claimed,
-        last_word=last_word,
+        last_word=last_word
     )
 
+
 # ----------------------------------------------------
-# LEVEL 4.5 — ORDER BY SQL Injection (Column Enumeration)
+# LEVEL 4 — ORDER BY SQL Injection (Column Enumeration)
 # ----------------------------------------------------
-@app.route("/columns")
+@app.route("/columns", methods=["GET", "POST"])
 def columns():
     if "user" not in session:
         return redirect("/login")
 
-    payload = request.args.get("id", "")
-
-    # First arrival
-    if payload == "":
-        return render_template(
-            "columns.html",
-            result=None,
-            dangerous=False,
-            already_claimed=False,
-            last_word=None
-        )
-
-    lower_p = payload.lower()
-
-    # Detect ORDER BY based SQLi
-    is_order_attack = "order by" in lower_p
-
-    # Track secret word award
-    already_claimed = session.get("secret_given_columns", False)
+    result_msg = None
+    rows_output = None
+    dangerous = False
+    earned_secret = False
     last_word = None
 
-    result_msg = None
+    if request.method == "POST":
+        payload = request.form.get("id", "").strip()
+        lower_p = payload.lower()
 
-    if is_order_attack:
-        conn = get_db()
-        cur = conn.cursor()
-        log_injection(payload, "/columns")
+        if payload == "":
+            result_msg = (
+                "<span style='color:#f80;'>The chamber is silent. Offer it something…</span>"
+            )
 
-        # Vulnerable query
-        query = f"SELECT id, name, description FROM products WHERE id={payload}"
+        else:
+            # Regex detection (strong)
+            import re
+            is_order_attack = bool(re.search(r"\border\s*by\b", lower_p))
+            dangerous = is_order_attack
 
-        try:
-            cur.execute(query)
-            rows = cur.fetchall()
-            result_msg = "<span style='color:#0f0;'>VALID — The columns align.</span>"
-        except Exception as e:
-            result_msg = "<span style='color:#f55;'>INVALID — The structure collapses.</span>"
+            if is_order_attack:
+                conn = get_db()
+                cur = conn.cursor()
+                log_injection(payload, "/columns")
 
-        conn.close()
+                query = f"SELECT id, name, description FROM products WHERE id={payload}"
 
-        # AWARD SECRET WORD ONLY ONCE
-        if not already_claimed:
-            award_random_secret_word()
-            session["secret_given_columns"] = True
-            last_word = session.get("last_secret_word")
+                try:
+                    cur.execute(query)
+                    rows = cur.fetchall()
+                    rows_output = [dict(r) for r in rows]
+                    result_msg = "<span style='color:#0f0;'>VALID — The columns align.</span>"
+
+                except Exception as e:
+                    result_msg = (
+                        f"<span style='color:#f55;'>INVALID — {e}</span>"
+                    )
+
+                conn.close()
+
+                # Always award a secret word for this attack
+                last_word = award_random_secret_word()
+                earned_secret = True
+
+            else:
+                result_msg = (
+                    "<span style='color:#f80;'>The chamber only responds to ORDER BY magic…</span>"
+                )
+                dangerous = False
 
     return render_template(
         "columns.html",
         result=result_msg,
-        dangerous=is_order_attack,
-        already_claimed=already_claimed,
+        rows=rows_output,
+        dangerous=dangerous,
+        earned_secret=earned_secret,    # NEW
         last_word=last_word
     )
-
 
 # ----------------------------------------------------
 # LEVEL 5 — ADMIN BYPASS
